@@ -1,5 +1,6 @@
 const fs = require("fs");
 const path = require("path");
+const os = require("os");
 const axios = require("axios");
 
 
@@ -8,9 +9,10 @@ const axios = require("axios");
 // ============================================================
 
 const DATA_DIR =
+    process.env.DATA_DIR ||
     path.join(
-        __dirname,
-        "data"
+        os.tmpdir(),
+        "website-monitor-data"
     );
 
 
