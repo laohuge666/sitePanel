@@ -763,34 +763,30 @@ httpServer.listen(
         );
 
 
-        try{
+        axios.get(
+            "https://api.ipify.org?format=json",
+            {
+                timeout:5000
+            }
+        ).then(
+            ip=>{
 
-
-            const ip =
-                await axios.get(
-                    "https://api.ipify.org?format=json",
-                    {
-                        timeout:5000
-                    }
+                console.log(
+                    `[OUTBOUND IP] ${ip.data.ip}`
                 );
 
+            }
+        ).catch(
+            error=>{
 
-            console.log(
-                `[OUTBOUND IP] ${ip.data.ip}`
-            );
+                console.error(
+                    "[IP ERROR]",
+                    error.message
+                );
 
+            }
+        );
 
-        }
-        catch(error){
-
-
-            console.error(
-                "[IP ERROR]",
-                error.message
-            );
-
-
-        }
 
 
 
