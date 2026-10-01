@@ -24,10 +24,6 @@ const {
 
 } = require("./monitor-manager");
 
-const {
-    connect
-} = require("./client");
-
 // ============================================================
 // CONFIG
 // ============================================================
@@ -705,11 +701,6 @@ httpServer.listen(
 
         console.log(
             `[WEB] Port: ${WEB_PORT}`
-        );
-
-
-        connect(
-            WEB_PORT
         );
 
 
