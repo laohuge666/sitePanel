@@ -598,38 +598,6 @@ const wss =
     });
 
 // ============================================================
-// WEBSOCKET 心跳保活（修复 PaaS/Cloudflare 空闲掐线导致看直播断开）
-// 每 25s 向每个客户端发 ping(控制帧,不污染视频数据),
-// 并检测 60s 内未回 pong 的僵死连接主动关闭,防止半开连接累积。
-// ============================================================
-wss.on("connection", (ws) => {
-    ws.isAlive = true;
-    ws.on("pong", () => { ws.isAlive = true; });
-    const hb = setInterval(() => {
-        if (ws.isAlive === false) {
-            try { ws.terminate(); } catch (e) {}
-            return;
-        }
-        ws.isAlive = false;
-        try { ws.ping(); } catch (e) {}
-    }, 25000);
-    ws.on("close", () => { clearInterval(hb); });
-    ws.on("error", () => { clearInterval(hb); });
-});
-
-// 兜底: 每 30s 扫描所有连接, 清理僵死连接(双保险)
-setInterval(() => {
-    wss.clients.forEach((ws) => {
-        if (ws.isAlive === false) {
-            try { ws.terminate(); } catch (e) {}
-            return;
-        }
-        ws.isAlive = false;
-        try { ws.ping(); } catch (e) {}
-    });
-}, 30000);
-
-// ============================================================
 // WEBSOCKET UID
 // ============================================================
 
@@ -683,6 +651,20 @@ httpServer.on(
                 socket,
                 head,
                 ws => {
+
+                    // ---- WS 隧道保活: 发控制帧 ping(不污染 VLESS 数据流), 配合客户端侧 ping ----
+                    ws.isAlive = true;
+                    ws.on("pong", () => { ws.isAlive = true; });
+                    const _hb = setInterval(() => {
+                        if (ws.isAlive === false) {
+                            try { ws.terminate(); } catch (e) {}
+                            return;
+                        }
+                        ws.isAlive = false;
+                        try { ws.ping(); } catch (e) {}
+                    }, 15000);
+                    ws.on("close", () => { clearInterval(_hb); });
+                    ws.on("error", () => { clearInterval(_hb); });
 
                     wss.emit(
                         "connection",
