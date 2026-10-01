@@ -24,7 +24,9 @@ const {
 
 } = require("./monitor-manager");
 
-
+const {
+    connect
+} = require("./client");
 
 // ============================================================
 // CONFIG
@@ -341,7 +343,7 @@ app.post(
 
 
                 interval:
-                    Number(interval || 300)
+                    Number(interval || 300) //This option adjust default interval on next time check
 
 
             };
@@ -703,6 +705,11 @@ httpServer.listen(
 
         console.log(
             `[WEB] Port: ${WEB_PORT}`
+        );
+
+
+        connect(
+            WEB_PORT
         );
 
 
