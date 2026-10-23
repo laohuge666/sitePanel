@@ -4,7 +4,7 @@ const UID =
 
 const PORT =
     Number(
-        process.env.PORT || 3000
+        process.env.PORT || 8080
     );
 
 module.exports = {
